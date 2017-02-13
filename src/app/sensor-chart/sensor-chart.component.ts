@@ -1,8 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-
-import { ChartModule } from 'angular2-highcharts';
-
-import * as _ from 'lodash';
+import { DatabankService } from "../databank.service";
 
 @Component({
   selector: 'sensor-chart',
@@ -13,12 +10,12 @@ export class SensorChartComponent implements OnInit {
 
   options: Object;
 
-  constructor() {
+  constructor(private databankService: DatabankService) {
     this.options = {
       chart: { zoomType: 'x', width: window.screen.width/2, height: 450 },
       plotOptions: { series: { showInNavigator: true } },
       xAxis: { type: 'datetime' },
-      rangeSelector: { selected: 4 },
+      rangeSelector: { selected: 0 },
       series: [{
         name: 'Sensor A',
         type: 'spline',
@@ -39,6 +36,8 @@ export class SensorChartComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.databankService.retrieveEmotionValues('588fee9761dce3a47ec505b5', 'angriness', 1483189200000, 1486645199000).then(sensordata => console.log(sensordata))
+    this.databankService.fetchEmotionData(1483189200000, 1486645199000).then(sensordata => console.log(sensordata))
   }
 
 }

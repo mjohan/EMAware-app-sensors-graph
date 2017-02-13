@@ -8,6 +8,8 @@ import { ChartModule } from 'angular2-highcharts';
 import { AppComponent } from './app.component';
 import { SensorChartComponent } from './sensor-chart/sensor-chart.component';
 
+import { DatabankService } from './databank.service';
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -19,7 +21,7 @@ import { SensorChartComponent } from './sensor-chart/sensor-chart.component';
     HttpModule,
     ChartModule
   ],
-  providers: [],
+  providers: [DatabankService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
