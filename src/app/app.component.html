@@ -60,22 +60,14 @@
       <div class="w3-white w3-text-grey w3-card-4" style="margin-bottom: 8px">
         <div class="w3-container w3-small">
           <h5 class="w3-text-grey"><i class="fa fa-check-square-o w3-margin-right w3-large w3-text-teal"></i>Emotion Logs</h5>
-          <p style="margin-top: 0">
-            <input class="w3-check" type="checkbox">
-            <label class="w3-validate w3-text-grey">Engagement</label>
-          </p>
-          <p>
-            <input class="w3-check" type="checkbox">
-            <label class="w3-validate w3-text-grey">Boredom</label>
-          </p>
-          <p>
-            <input class="w3-check" type="checkbox">
-            <label class="w3-validate w3-text-grey">Confusion</label>
-          </p>
-          <p>
-            <input class="w3-check" type="checkbox">
-            <label class="w3-validate w3-text-grey">Frustration</label>
-          </p>
+          <div *ngFor="let emotion of emotions">
+            <label>
+              <input class="w3-radio" type="radio" name="emotion" [(ngModel)]="selected.emotion" [value]="emotion.index" (ngModelChange)="updateEmotionGraph()">
+              {{ emotion.name }}
+            </label>
+            <br>
+          </div>
+          <br>
         </div>
       </div>
       <!-- End Left Column -->

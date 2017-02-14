@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { DatabankService } from "../databank.service";
+import { GraphEventService } from "../services/graph-event.service";
 
 @Component({
   selector: 'sensor-chart',
@@ -9,35 +9,29 @@ import { DatabankService } from "../databank.service";
 export class SensorChartComponent implements OnInit {
 
   options: Object;
+  chart: any;
 
-  constructor(private databankService: DatabankService) {
+  constructor(private graphEventService: GraphEventService) {
     this.options = {
-      chart: { zoomType: 'x', width: window.screen.width/2, height: 450 },
+      chart: { zoomType: 'x', width: window.screen.width/2, height: 600 },
       plotOptions: { series: { showInNavigator: true } },
       xAxis: { type: 'datetime' },
-      rangeSelector: { selected: 0 },
-      series: [{
-        name: 'Sensor A',
-        type: 'spline',
-        data: [
-          [1486664737234, 23.21],
-          [1486664837234, 54.12],
-          [1486664937234, 76.12],
-          [1486665037234, 12.23],
-          [1486665137234, 43.12],
-          [1486665237234, 23.21],
-          [1486665337234, 54.12],
-          [1486665437234, 76.12],
-          [1486665537234, 12.23],
-          [1486665637234, 43.12]
-        ]
-      }]
+      yAxis: [{ height: '60%' }, { min: 1, max: 5, height: '35%', top: '65%' }],
+      rangeSelector: { selected: 0 }
     };
+
+    this.graphEventService.graphSeriesAdded$.subscribe(series => this.chart.addSeries(series));
+    this.graphEventService.graphSeriesRemoved$.subscribe(index => this.chart.series[index].remove());
+    this.graphEventService.graphSeriesLoading$.subscribe(loading => {
+      if (loading) this.chart.showLoading();
+      else this.chart.hideLoading();
+    });
   }
 
-  ngOnInit() {
-    this.databankService.retrieveEmotionValues('588fee9761dce3a47ec505b5', 'angriness', 1483189200000, 1486645199000).then(sensordata => console.log(sensordata))
-    this.databankService.fetchEmotionData(1483189200000, 1486645199000).then(sensordata => console.log(sensordata))
+  ngOnInit() { }
+
+  saveChart(chartObject: Object) {
+    this.chart = chartObject;
   }
 
 }
