@@ -3,4 +3,5 @@ export class GraphSeries {
   type: string;
   data: number[][];
   yAxis: number;
+  marker: any;
 }

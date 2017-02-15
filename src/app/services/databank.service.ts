@@ -29,11 +29,11 @@ export class DatabankService {
   }
 
   private static filterData(userId: string, filterKey: string, dataArray: any): Datapoint[] {
-    let userFiltered = _.filter(dataArray, function (e) {
+    let userFiltered = _.filter(dataArray, function (e: any) {
       return e.userId == userId && e.hasOwnProperty(filterKey);
     });
 
-    let dataFiltered = _.map(userFiltered, function (e) {
+    let dataFiltered = _.map(userFiltered, function (e: any) {
       return {
         timestamp: new Date(e.timestamp).getTime(),
         value: e[filterKey]
@@ -73,7 +73,7 @@ export class DatabankService {
 
   retrieveSensorValues(userId: string, sensor: string, startDate: number, endDate: number): Promise<Datapoint[]> {
     return new Promise((resolve, reject) => {
-      this.fetchEmotionData(startDate, endDate).then(sensordata => {
+      this.fetchSensorData(startDate, endDate).then(sensordata => {
         resolve(DatabankService.filterData(userId, sensor, sensordata));
       }).catch(error => reject(error));
     });

@@ -10,11 +10,15 @@ import { SensorChartComponent } from './sensor-chart/sensor-chart.component';
 
 import { GraphEventService } from './services/graph-event.service';
 import { DatabankService } from './services/databank.service';
+import { DashboardPageComponent } from './dashboard-page/dashboard-page.component';
+import { DashboardSideRadioComponent } from './dashboard-page/dashboard-side-radio/dashboard-side-radio.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    SensorChartComponent
+    SensorChartComponent,
+    DashboardPageComponent,
+    DashboardSideRadioComponent
   ],
   imports: [
     BrowserModule,

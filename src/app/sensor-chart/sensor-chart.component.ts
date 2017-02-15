@@ -15,9 +15,18 @@ export class SensorChartComponent implements OnInit {
     this.options = {
       chart: { zoomType: 'x', width: window.screen.width/2, height: 600 },
       plotOptions: { series: { showInNavigator: true } },
-      xAxis: { type: 'datetime' },
+      xAxis: { type: 'datetime', minRange: 60000 },
       yAxis: [{ height: '60%' }, { min: 1, max: 5, height: '35%', top: '65%' }],
-      rangeSelector: { selected: 0 }
+      rangeSelector: {
+        buttons: [
+          { type: 'minute', count: 5, text: '5m' },
+          { type: 'minute', count: 10, text: '10m' },
+          { type: 'minute', count: 30, text: '30m' },
+          { type: 'hour', count: 1, text: '1h' },
+          { type: 'all', text: 'All'}
+        ],
+        selected: 4
+        },
     };
 
     this.graphEventService.graphSeriesAdded$.subscribe(series => this.chart.addSeries(series));
