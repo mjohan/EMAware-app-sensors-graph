@@ -29,7 +29,7 @@ export class DashboardPageComponent implements OnInit {
     { index: 2, map: 'accelerometer', name: 'Accelerometer' }
   ];
 
-  private selected = { emotion: this.emotions[0].index, sensor: this.sensors[0].index };
+  private selected = { emotion: this.emotions[0].index, sensor: this.sensors[0].index, username: '' };
   private lastSelected = { emotion: null, sensor: null };
   private numGraphsLoaded = 0;
 
@@ -79,6 +79,10 @@ export class DashboardPageComponent implements OnInit {
         if (this.numGraphsLoaded == DashboardPageComponent.GRAPHS_NUMBER) this.graphEventService.load(false);
       }
     );
+  }
+
+  searchUser(): void {
+    this.databankService.retrieveGraphUser(this.selected.username).then(graphUser => console.log(graphUser));
   }
 
   ngOnInit() {

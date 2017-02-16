@@ -5,4 +5,5 @@ export class BackendConfiguration {
 
   public static EMOTION_PATH = 'classifications';
   public static SENSORS_PATH = 'msbands';
+  public static USER_PATH = 'users';
 }

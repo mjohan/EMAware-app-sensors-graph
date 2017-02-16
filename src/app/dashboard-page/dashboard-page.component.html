@@ -17,11 +17,11 @@
             <i class="fa fa-user w3-margin-right w3-large w3-text-teal"></i>Username
           </h5>
           <p style="margin-top: 0">
-            <input class="w3-input" type="text" required>
+            <input class="w3-input" type="text" required [(ngModel)]="selected.username">
           </p>
         </div>
         <div class="w3-container w3-small">
-          <button class="w3-btn-block w3-section w3-teal w3-ripple" style="margin-top: 0!important;">Search</button>
+          <button class="w3-btn-block w3-section w3-teal w3-ripple" style="margin-top: 0!important;" (click)="searchUser()">Search</button>
         </div>
       </div>
 

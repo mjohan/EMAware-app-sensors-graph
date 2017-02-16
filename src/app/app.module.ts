@@ -13,6 +13,11 @@ import { DatabankService } from './services/databank.service';
 import { DashboardPageComponent } from './dashboard-page/dashboard-page.component';
 import { DashboardSideRadioComponent } from './dashboard-page/dashboard-side-radio/dashboard-side-radio.component';
 
+const Highcharts = require('highcharts');
+Highcharts.setOptions({
+  global: { useUTC : true, timezoneOffset: new Date().getTimezoneOffset() }
+});
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -24,7 +29,7 @@ import { DashboardSideRadioComponent } from './dashboard-page/dashboard-side-rad
     BrowserModule,
     FormsModule,
     HttpModule,
-    ChartModule
+    ChartModule.forRoot(Highcharts)
   ],
   providers: [
     DatabankService,

@@ -8,6 +8,8 @@ import { BackendConfiguration } from '../backend-configuration';
 import { SensauraEmotion } from '../classes/sensaura-emotion';
 import { SensorData } from '../classes/sensor-data';
 import { Datapoint } from '../classes/datapoint';
+import { GraphUser } from '../classes/graph-user';
+import { BackendUser } from '../classes/backend-user';
 
 @Injectable()
 export class DatabankService {
@@ -43,7 +45,7 @@ export class DatabankService {
     return dataFiltered as Datapoint[];
   }
 
-  fetchEmotionData(startDate: number, endDate: number): Promise<SensauraEmotion[]> {
+  private fetchEmotionData(startDate: number, endDate: number): Promise<SensauraEmotion[]> {
     let requestUrl = BackendConfiguration.API_ENDPOINT + BackendConfiguration.EMOTION_PATH
                       + "?page=0&limit=0&from=" + startDate + "&end=" + endDate;
 
@@ -61,7 +63,7 @@ export class DatabankService {
     });
   }
 
-  fetchSensorData(startDate: number, endDate: number): Promise<SensorData[]> {
+  private fetchSensorData(startDate: number, endDate: number): Promise<SensorData[]> {
     let requestUrl = BackendConfiguration.API_ENDPOINT + BackendConfiguration.SENSORS_PATH
                       + "?page=0&limit=0&from=" + startDate + "&end=" + endDate;
 
@@ -75,6 +77,32 @@ export class DatabankService {
     return new Promise((resolve, reject) => {
       this.fetchSensorData(startDate, endDate).then(sensordata => {
         resolve(DatabankService.filterData(userId, sensor, sensordata));
+      }).catch(error => reject(error));
+    });
+  }
+
+  private fetchBackendUsers(): Promise<BackendUser[]> {
+    let requestUrl = BackendConfiguration.API_ENDPOINT + BackendConfiguration.USER_PATH
+                      + "?page=1&limit=80";
+
+    return this.http.get(requestUrl, DatabankService.getRequestOptions())
+      .toPromise()
+      .then(response => response.json().users as BackendUser[])
+      .catch(DatabankService.handleError);
+  }
+
+  retrieveGraphUser(username: string): Promise<GraphUser> {
+    return new Promise((resolve, reject) => {
+      this.fetchBackendUsers().then(users => {
+        let filteredUsers: BackendUser[] = _.filter(users, function (e: BackendUser) {
+          return e.username == username;
+        });
+
+        resolve({
+          userId: filteredUsers[0]._id,
+          username: filteredUsers[0].username,
+          rtKey: filteredUsers[0].firstName
+        });
       }).catch(error => reject(error));
     });
   }
