@@ -11,19 +11,10 @@
 
     <!-- Left Column -->
     <div class="w3-quarter">
-      <div class="w3-white w3-text-grey w3-card-4" style="margin-bottom: 8px">
-        <div class="w3-container w3-small">
-          <h5 class="w3-text-grey">
-            <i class="fa fa-user w3-margin-right w3-large w3-text-teal"></i>Username
-          </h5>
-          <p style="margin-top: 0">
-            <input class="w3-input" type="text" required [(ngModel)]="selected.username">
-          </p>
-        </div>
-        <div class="w3-container w3-small">
-          <button class="w3-btn-block w3-section w3-teal w3-ripple" style="margin-top: 0!important;" (click)="searchUser()">Search</button>
-        </div>
-      </div>
+      <dashboard-side-filter 
+        [(selected)]="selected" 
+        (searchButtonClicked)="searchData()">
+      </dashboard-side-filter>
 
       <dashboard-side-radio
         [(options)]="sensors"

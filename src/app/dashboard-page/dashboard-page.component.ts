@@ -56,10 +56,13 @@ export class DashboardPageComponent implements OnInit {
     this.numGraphsLoaded++;
   }
 
-  updateEmotionGraph(): void {
+  updateEmotionGraph(userId: string): void {
     this.graphEventService.load(true);
 
-    this.databankService.retrieveEmotionValues('58a3a96d407adb0142931ff0', this.emotions[this.selected.emotion].map, 0, new Date().getTime()).then(
+    let startDate = new Date();
+    startDate.setDate(startDate.getDate() - 1);
+
+    this.databankService.retrieveEmotionValues(userId, this.emotions[this.selected.emotion].map, startDate.getTime(), new Date().getTime()).then(
       sensordata => {
         this.prepareGraphSeries(sensordata, this.emotions, 'emotion', 'scatter', 1);
         if (this.numGraphsLoaded == DashboardPageComponent.GRAPHS_NUMBER) this.graphEventService.load(false);
@@ -67,13 +70,13 @@ export class DashboardPageComponent implements OnInit {
     );
   }
 
-  updateSensorGraph(): void {
+  updateSensorGraph(userId: string): void {
     this.graphEventService.load(true);
 
     let startDate = new Date();
     startDate.setDate(startDate.getDate() - 1);
 
-    this.databankService.retrieveSensorValues('58a3a96d407adb0142931ff0', this.sensors[this.selected.sensor].map, startDate.getTime(), new Date().getTime()).then(
+    this.databankService.retrieveSensorValues(userId, this.sensors[this.selected.sensor].map, startDate.getTime(), new Date().getTime()).then(
       sensordata => {
         this.prepareGraphSeries(sensordata, this.sensors, 'sensor', 'line', 0);
         if (this.numGraphsLoaded == DashboardPageComponent.GRAPHS_NUMBER) this.graphEventService.load(false);
@@ -81,14 +84,14 @@ export class DashboardPageComponent implements OnInit {
     );
   }
 
-  searchUser(): void {
-    this.databankService.retrieveGraphUser(this.selected.username).then(graphUser => console.log(graphUser));
+  searchData(): void {
+    this.databankService.retrieveGraphUser(this.selected.username)
+      .then(graphUser => {
+        this.updateEmotionGraph(graphUser.userId);
+        this.updateSensorGraph(graphUser.userId);
+      })
+      .catch(error => console.log(error));
   }
 
-  ngOnInit() {
-    setTimeout(() => {
-      this.updateEmotionGraph();
-      this.updateSensorGraph();
-    }, 1000);
-  }
+  ngOnInit() { }
 }

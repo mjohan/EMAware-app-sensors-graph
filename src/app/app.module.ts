@@ -12,6 +12,7 @@ import { GraphEventService } from './services/graph-event.service';
 import { DatabankService } from './services/databank.service';
 import { DashboardPageComponent } from './dashboard-page/dashboard-page.component';
 import { DashboardSideRadioComponent } from './dashboard-page/dashboard-side-radio/dashboard-side-radio.component';
+import { DashboardSideFilterComponent } from './dashboard-page/dashboard-side-filter/dashboard-side-filter.component';
 
 const Highcharts = require('highcharts');
 Highcharts.setOptions({
@@ -23,7 +24,8 @@ Highcharts.setOptions({
     AppComponent,
     SensorChartComponent,
     DashboardPageComponent,
-    DashboardSideRadioComponent
+    DashboardSideRadioComponent,
+    DashboardSideFilterComponent
   ],
   imports: [
     BrowserModule,

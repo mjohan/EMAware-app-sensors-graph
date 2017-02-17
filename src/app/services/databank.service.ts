@@ -98,11 +98,12 @@ export class DatabankService {
           return e.username == username;
         });
 
-        resolve({
-          userId: filteredUsers[0]._id,
-          username: filteredUsers[0].username,
-          rtKey: filteredUsers[0].firstName
-        });
+        if (filteredUsers.length > 0) {
+          let user = filteredUsers[0];
+          resolve({ userId: user._id, username: user.username, rtKey: user.firstName});
+        } else {
+          reject({message: "Username is not found!"});
+        }
       }).catch(error => reject(error));
     });
   }

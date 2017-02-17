@@ -3,21 +3,21 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { DebugElement } from '@angular/core';
 
-import { DashboardSideRadioComponent } from './dashboard-side-radio.component';
+import { DashboardSideFilterComponent } from './dashboard-side-filter.component';
 
-describe('DashboardSideRadioComponent', () => {
-  let component: DashboardSideRadioComponent;
-  let fixture: ComponentFixture<DashboardSideRadioComponent>;
+describe('DashboardSideFilterComponent', () => {
+  let component: DashboardSideFilterComponent;
+  let fixture: ComponentFixture<DashboardSideFilterComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ DashboardSideRadioComponent ]
+      declarations: [ DashboardSideFilterComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(DashboardSideRadioComponent);
+    fixture = TestBed.createComponent(DashboardSideFilterComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
