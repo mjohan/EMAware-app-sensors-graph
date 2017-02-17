@@ -35,14 +35,16 @@ export class DatabankService {
       return e.userId == userId && e.hasOwnProperty(filterKey);
     });
 
-    let dataFiltered = _.map(userFiltered, function (e: any) {
+    let dataPoints = _.map(userFiltered, function (e: any) {
       return {
         timestamp: new Date(e.timestamp).getTime(),
         value: e[filterKey]
       };
     });
 
-    return dataFiltered as Datapoint[];
+    dataPoints = _.sortBy(dataPoints, function (e: Datapoint) { return e.timestamp });
+
+    return dataPoints as Datapoint[];
   }
 
   private fetchEmotionData(startDate: number, endDate: number): Promise<SensauraEmotion[]> {

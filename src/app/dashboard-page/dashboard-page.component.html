@@ -21,7 +21,7 @@
         [(selected)]="selected"
         key="sensor"
         title="Sensors"
-        (selectedItemChanged)="updateSensorGraph()">
+        (selectedItemChanged)="reloadSensorGraph()">
       </dashboard-side-radio>
 
       <div class="w3-white w3-text-grey w3-card-4" style="margin-bottom: 8px">
@@ -43,7 +43,7 @@
         [(selected)]="selected"
         key="emotion"
         title="Emotions"
-        (selectedItemChanged)="updateEmotionGraph()">
+        (selectedItemChanged)="reloadEmotionGraph()">
       </dashboard-side-radio>
       <!-- End Left Column -->
     </div>

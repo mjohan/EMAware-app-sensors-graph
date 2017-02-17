@@ -19,10 +19,10 @@ export class SensorChartComponent implements OnInit {
       yAxis: [{ height: '50%' }, { min: 1, max: 5, height: '10%', top: '85%' }],
       rangeSelector: {
         buttons: [
-          { type: 'minute', count: 5, text: '5m' },
           { type: 'minute', count: 10, text: '10m' },
           { type: 'minute', count: 30, text: '30m' },
           { type: 'hour', count: 1, text: '1h' },
+          { type: 'day', count: 1, text: '1d' },
           { type: 'all', text: 'All'}
         ],
         selected: 4
