@@ -14,6 +14,7 @@ import { DashboardSideFilterComponent } from './dashboard-page/dashboard-side-fi
 
 import { GraphEventService } from './services/graph-event.service';
 import { DatabankService } from './services/databank.service';
+import { RescuetimeService } from './services/rescuetime.service';
 
 const Highcharts = require('highcharts');
 Highcharts.setOptions({
@@ -37,7 +38,8 @@ Highcharts.setOptions({
   ],
   providers: [
     DatabankService,
-    GraphEventService
+    GraphEventService,
+    RescuetimeService
   ],
   bootstrap: [AppComponent]
 })

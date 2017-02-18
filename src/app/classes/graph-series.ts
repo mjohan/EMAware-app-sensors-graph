@@ -5,4 +5,5 @@ export class GraphSeries {
   yAxis: number;
   marker: any;
   color: string;
+  step: boolean;
 }

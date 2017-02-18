@@ -4,6 +4,7 @@ import { GraphOption } from "../classes/graph-option";
 import { Datapoint } from "../classes/datapoint";
 import { GraphEventService } from "../services/graph-event.service";
 import { DatabankService } from "../services/databank.service";
+import { RescuetimeService } from "../services/rescuetime.service";
 
 import * as _ from 'lodash';
 
@@ -29,30 +30,48 @@ export class DashboardPageComponent implements OnInit {
     { index: 2, map: 'accelerometer', name: 'Accelerometer' }
   ];
 
+  private rtOptions = [
+    { index: 0, map: '', name: 'Number activities' }
+  ];
+
   private selected = { 
     emotion: this.emotions[0].index, 
-    sensor: this.sensors[0].index, 
+    sensor: this.sensors[0].index,
+    rtOption: this.rtOptions[0].index,
     username: '',
     dateRange: {
-      beginDate: { year: this.today.getFullYear(), month: this.today.getMonth(), day: this.today.getDate() - 1 },
-      endDate: { year: this.today.getFullYear(), month: this.today.getMonth(), day: this.today.getDate() }
+      beginDate: { year: this.today.getFullYear(), month: this.today.getMonth() + 1, day: this.today.getDate() - 1 },
+      endDate: { year: this.today.getFullYear(), month: this.today.getMonth() + 1, day: this.today.getDate() }
     }
   };
-  private lastSelected = { emotion: null, sensor: null, userId: '' };
+  private lastSelected = { emotion: null, sensor: null, rtOption: null, userId: '' };
 
-  constructor(private graphEventService: GraphEventService, private databankService: DatabankService) { }
+  constructor(
+    private graphEventService: GraphEventService,
+    private databankService: DatabankService,
+    private rescuetimeService: RescuetimeService) { }
 
   private getGraphDate() {
     let beginDate = this.selected.dateRange.beginDate;
     let endDate = this.selected.dateRange.endDate;
 
     return {
-      start: new Date(beginDate.year, beginDate.month, beginDate.day, 0, 0, 0, 0).getTime(),
-      end: new Date(endDate.year, endDate.month, endDate.day, 23, 59, 59, 999).getTime(),
+      start: new Date(beginDate.year, beginDate.month - 1, beginDate.day, 0, 0, 0, 0).getTime(),
+      end: new Date(endDate.year, endDate.month - 1, endDate.day, 23, 59, 59, 999).getTime(),
     }
   }
 
-  private prepareGraphSeries(data: Datapoint[], options: GraphOption[], key: string, seriesType: string, yAxis: number, color: string): void {
+  private rtDate() {
+    let beginDate = this.selected.dateRange.beginDate;
+    let endDate = this.selected.dateRange.endDate;
+
+    return {
+      start: beginDate.year + '-' + beginDate.month + '-' + beginDate.day,
+      end: endDate.year + '-' + endDate.month + '-' + endDate.day
+    }
+  }
+
+  private prepareGraphSeries(data: Datapoint[], options: GraphOption[], key: string, seriesType: string, yAxis: number, color: string, step: boolean): void {
     if (this.lastSelected[key] != null) {
       this.graphEventService.remove(options[this.lastSelected[key]].name);
     }
@@ -65,7 +84,8 @@ export class DashboardPageComponent implements OnInit {
         return [ e.timestamp, e.value ];
       }),
       yAxis: yAxis,
-      color: color
+      color: color,
+      step: step
     });
 
     this.lastSelected[key] = this.selected[key];
@@ -76,7 +96,7 @@ export class DashboardPageComponent implements OnInit {
       this.graphEventService.load(true);
       this.databankService.retrieveEmotionValues(this.lastSelected.userId, this.emotions[this.selected.emotion].map, this.getGraphDate().start, this.getGraphDate().end)
         .then(sensordata => {
-          this.prepareGraphSeries(sensordata, this.emotions, 'emotion', 'scatter', 1, '#90ed7d');
+          this.prepareGraphSeries(sensordata, this.emotions, 'emotion', 'scatter', 1, '#90ed7d', false);
           this.graphEventService.load(false);
         }
       );
@@ -90,7 +110,7 @@ export class DashboardPageComponent implements OnInit {
       this.graphEventService.load(true);
       this.databankService.retrieveSensorValues(this.lastSelected.userId, this.sensors[this.selected.sensor].map, this.getGraphDate().start, this.getGraphDate().end)
         .then(sensordata => {
-          this.prepareGraphSeries(sensordata, this.sensors, 'sensor', 'line', 0, '#db843d');
+          this.prepareGraphSeries(sensordata, this.sensors, 'sensor', 'line', 0, '#db843d', false);
           this.graphEventService.load(false);
         }
       );
@@ -115,15 +135,16 @@ export class DashboardPageComponent implements OnInit {
           .then(sensorData => {
             this.databankService.retrieveEmotionValues(graphUser.userId, emotionFilter, start, end)
               .then(emotionData => {
-                this.prepareGraphSeries(sensorData, this.sensors, 'sensor', 'line', 0, '#db843d');
-                this.prepareGraphSeries(emotionData, this.emotions, 'emotion', 'scatter', 1, '#90ed7d');
-                this.graphEventService.load(false);
-              }
-            );
-          }
-        );
-      })
-      .catch(error => console.log(error));
+                this.rescuetimeService.retrieveActivityNumber(graphUser.rtKey, this.rtDate().start, this.rtDate().end)
+                  .then(rtData => {
+                    this.prepareGraphSeries(sensorData, this.sensors, 'sensor', 'line', 0, '#814718', false);
+                    this.prepareGraphSeries(rtData, this.rtOptions, 'rtOption', 'line', 1, '#ac5f20', true);
+                    this.prepareGraphSeries(emotionData, this.emotions, 'emotion', 'scatter', 2, '#db843d', false);
+                    this.graphEventService.load(false);
+                  });
+              });
+          });
+      }).catch(error => console.log(error));
   }
 
   ngOnInit() { }
