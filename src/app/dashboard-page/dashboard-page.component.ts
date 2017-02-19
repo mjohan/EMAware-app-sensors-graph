@@ -16,6 +16,7 @@ import * as _ from 'lodash';
 export class DashboardPageComponent implements OnInit {
 
   private today = new Date();
+  private error = { message: '' };
 
   private emotions = [
     { index: 0, map: 'excitement', name: 'Engagement' },
@@ -31,7 +32,7 @@ export class DashboardPageComponent implements OnInit {
   ];
 
   private rtOptions = [
-    { index: 0, map: '', name: 'Number activities' }
+    { index: 0, map: '', name: 'Activities number' }
   ];
 
   private selected = { 
@@ -44,7 +45,7 @@ export class DashboardPageComponent implements OnInit {
       endDate: { year: this.today.getFullYear(), month: this.today.getMonth() + 1, day: this.today.getDate() }
     }
   };
-  private lastSelected = { emotion: null, sensor: null, rtOption: null, userId: '' };
+  private lastSelected = { emotion: null, sensor: null, rtOption: null, userId: '', rtKey: '' };
 
   constructor(
     private graphEventService: GraphEventService,
@@ -96,12 +97,26 @@ export class DashboardPageComponent implements OnInit {
       this.graphEventService.load(true);
       this.databankService.retrieveEmotionValues(this.lastSelected.userId, this.emotions[this.selected.emotion].map, this.getGraphDate().start, this.getGraphDate().end)
         .then(sensordata => {
-          this.prepareGraphSeries(sensordata, this.emotions, 'emotion', 'scatter', 1, '#90ed7d', false);
+          this.prepareGraphSeries(sensordata, this.emotions, 'emotion', 'scatter', 2, '#db843d', false);
           this.graphEventService.load(false);
         }
       );
     } else {
       console.log("userId is empty");
+    }
+  }
+
+  private reloadRTGraph(): void {
+    if (this.lastSelected.rtKey.length > 0) {
+      this.graphEventService.load(true);
+      this.rescuetimeService.retrieveActivityNumber(this.lastSelected.rtKey, this.rtDate().start, this.rtDate().end)
+        .then(rtData => {
+          this.prepareGraphSeries(rtData, this.rtOptions, 'rtOption', 'line', 1, '#ac5f20', true);
+          this.graphEventService.load(false);
+        }
+      );
+    } else {
+      console.log("rtKey is empty");
     }
   }
 
@@ -124,7 +139,9 @@ export class DashboardPageComponent implements OnInit {
 
     this.databankService.retrieveGraphUser(this.selected.username)
       .then(graphUser => {
+        this.error.message = '';
         this.lastSelected.userId = graphUser.userId;
+        this.lastSelected.rtKey = graphUser.rtKey;
 
         let start = this.getGraphDate().start;
         let end = this.getGraphDate().end;
@@ -141,10 +158,12 @@ export class DashboardPageComponent implements OnInit {
                     this.prepareGraphSeries(rtData, this.rtOptions, 'rtOption', 'line', 1, '#ac5f20', true);
                     this.prepareGraphSeries(emotionData, this.emotions, 'emotion', 'scatter', 2, '#db843d', false);
                     this.graphEventService.load(false);
-                  });
+
+                    this.error.message = (sensorData.length > 0 || emotionData.length > 0 || rtData.length > 0) ? '' : 'No data found in this time period';
+                  }).catch(() => this.error.message = 'Problem occurred when fetching data from RescueTime');
               });
           });
-      }).catch(error => console.log(error));
+      }).catch(error => { this.error.message = error.message; this.graphEventService.load(false); } );
   }
 
   ngOnInit() { }

@@ -21,6 +21,7 @@ export class DashboardSideFilterComponent implements OnInit {
   };
 
   @Input() selected;
+  @Input() errorText;
 
   @Output() searchButtonClicked = new EventEmitter();
 

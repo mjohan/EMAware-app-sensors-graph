@@ -4,7 +4,7 @@
   <!-- The Grid -->
   <div class="w3-row-padding">
 
-    <header class="w3-panel w3-padding-16 w3-center w3-teal">
+    <header class="w3-panel w3-padding-16 w3-center w3-teal" style="margin-top: 0!important">
       <h1 class="w3-large">WEB DASHBOARD</h1>
       <h2>EMAware App Data</h2>
     </header>
@@ -12,7 +12,8 @@
     <!-- Left Column -->
     <div class="w3-quarter">
       <dashboard-side-filter 
-        [(selected)]="selected" 
+        [(selected)]="selected"
+        [errorText]="error.message"
         (searchButtonClicked)="searchData()">
       </dashboard-side-filter>
 
@@ -24,19 +25,13 @@
         (selectedItemChanged)="reloadSensorGraph()">
       </dashboard-side-radio>
 
-      <div class="w3-white w3-text-grey w3-card-4" style="margin-bottom: 8px">
-        <div class="w3-container w3-small">
-          <h5 class="w3-text-grey"><i class="fa fa-check-square-o w3-margin-right w3-large w3-text-teal"></i>RescueTime</h5>
-          <p style="margin-top: 0">
-            <input class="w3-check" type="checkbox">
-            <label class="w3-validate w3-text-grey">Activity Number</label>
-          </p>
-          <p>
-            <input class="w3-check" type="checkbox">
-            <label class="w3-validate w3-text-grey">Dominant Activity</label>
-          </p>
-        </div>
-      </div>
+      <dashboard-side-radio
+        [(options)]="rtOptions"
+        [(selected)]="selected"
+        key="rtOption"
+        title="RescueTime"
+        (selectedItemChanged)="reloadRTGraph()">
+      </dashboard-side-radio>
 
       <dashboard-side-radio
         [(options)]="emotions"
