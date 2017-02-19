@@ -1,0 +1,63 @@
+<!-- Page Container -->
+<div class="w3-content w3-margin-top" style="max-width:1400px;">
+
+  <!-- The Grid -->
+  <div class="w3-row-padding">
+
+    <header class="w3-panel w3-padding-16 w3-center w3-teal" style="margin-top: 0!important">
+      <h1 class="w3-large">WEB DASHBOARD</h1>
+      <h2>EMAware App Data</h2>
+    </header>
+
+    <!-- Left Column -->
+    <div class="w3-quarter">
+      <dashboard-side-filter 
+        [(selected)]="selected"
+        [errorText]="error.message"
+        (searchButtonClicked)="searchData()">
+      </dashboard-side-filter>
+
+      <dashboard-side-radio
+        [(options)]="sensors"
+        [(selected)]="selected"
+        key="sensor"
+        title="Sensors"
+        (selectedItemChanged)="reloadSensorGraph()">
+      </dashboard-side-radio>
+
+      <dashboard-side-radio
+        [(options)]="rtOptions"
+        [(selected)]="selected"
+        key="rtOption"
+        title="RescueTime"
+        (selectedItemChanged)="reloadRTGraph()">
+      </dashboard-side-radio>
+
+      <dashboard-side-radio
+        [(options)]="emotions"
+        [(selected)]="selected"
+        key="emotion"
+        title="Emotions"
+        (selectedItemChanged)="reloadEmotionGraph()">
+      </dashboard-side-radio>
+      <!-- End Left Column -->
+    </div>
+
+    <!-- Right Column -->
+    <div class="w3-threequarter">
+      <sensor-chart></sensor-chart>
+      <!-- End Right Column -->
+    </div>
+
+    <!-- End Grid -->
+  </div>
+
+  <footer class="w3-container w3-teal w3-center w3-margin-top w3-small">
+    <p><b>Copyright (c) 2017 Muhammad Johan Alibasa</b></p>
+    <p>Positive Computing Lab - The University of Sydney</p>
+    <p>Powered by <a href="http://www.w3schools.com/w3css/default.asp" target="_blank">w3.css</a></p>
+  </footer>
+
+  <!-- End Page Container -->
+</div>
+

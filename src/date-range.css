@@ -1,0 +1,16 @@
+.mydrp .btnclear, 
+.mydrp .btnpicker, 
+.mydrp .footerbtn, 
+.mydrp .headerbtn, 
+.mydrp .headerclearbtn, 
+.mydrp .headermonthtxt, 
+.mydrp .headeryeartxt, 
+.mydrp .monthinput, 
+.mydrp .selection, 
+.mydrp .yearinput {
+  color: #757575;
+}
+
+.mydrp * {
+  font-family: "Roboto", sans-serif
+}
