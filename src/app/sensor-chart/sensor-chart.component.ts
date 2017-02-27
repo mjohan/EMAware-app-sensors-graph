@@ -13,10 +13,10 @@ export class SensorChartComponent implements OnInit {
 
   constructor(private graphEventService: GraphEventService) {
     this.options = {
-      chart: { zoomType: 'x', width: window.screen.width/2, height: 600 },
+      chart: { zoomType: 'x', width: window.screen.width/2, height: 650 },
       plotOptions: { series: { showInNavigator: true } },
       xAxis: { type: 'datetime', minRange: 60000 },
-      yAxis: [{ height: '50%' }, {height: '25%', top: '55%' }, { min: 1, max: 5, height: '10%', top: '85%' }],
+      yAxis: [{ height: '45%' }, {height: '30%', top: '50%' }, { min: 0, max: 4, height: '10%', top: '85%' }],
       rangeSelector: {
         buttons: [
           { type: 'minute', count: 10, text: '10m' },
