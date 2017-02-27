@@ -30,15 +30,17 @@ export class DatabankService {
     return Promise.reject(error.message || error);
   }
 
-  private static filterData(userId: string, filterKey: string, dataArray: any): Datapoint[] {
+  private static filterData(userId: string, filterKey: string, dataArray: any, zeroize: boolean): Datapoint[] {
     let userFiltered = _.filter(dataArray, function (e: any) {
       return e.userId == userId && e.hasOwnProperty(filterKey);
     });
 
     let dataPoints = _.map(userFiltered, function (e: any) {
+      let val = (zeroize) ? e[filterKey] - 1 : e[filterKey];
+      if (zeroize) console.log(val);
       return {
         timestamp: new Date(e.timestamp).getTime(),
-        value: e[filterKey]
+        value: val
       };
     });
 
@@ -60,7 +62,7 @@ export class DatabankService {
   retrieveEmotionValues(userId: string, emotion: string, startDate: number, endDate: number): Promise<Datapoint[]> {
     return new Promise((resolve, reject) => {
       this.fetchEmotionData(startDate, endDate).then(sensordata => {
-        resolve(DatabankService.filterData(userId, emotion, sensordata));
+        resolve(DatabankService.filterData(userId, emotion, sensordata, true));
       }).catch(error => reject(error));
     });
   }
@@ -78,7 +80,7 @@ export class DatabankService {
   retrieveSensorValues(userId: string, sensor: string, startDate: number, endDate: number): Promise<Datapoint[]> {
     return new Promise((resolve, reject) => {
       this.fetchSensorData(startDate, endDate).then(sensordata => {
-        resolve(DatabankService.filterData(userId, sensor, sensordata));
+        resolve(DatabankService.filterData(userId, sensor, sensordata, false));
       }).catch(error => reject(error));
     });
   }
