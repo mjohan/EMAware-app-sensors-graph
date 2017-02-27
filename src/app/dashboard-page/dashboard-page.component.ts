@@ -32,7 +32,11 @@ export class DashboardPageComponent implements OnInit {
   ];
 
   private rtOptions = [
-    { index: 0, map: '', name: 'Activities number' }
+    { index: 0, map: RescuetimeService.TASKS_FILTER, name: 'Activities number' },
+    { index: 1, map: RescuetimeService.PRODUCTIVITY_FILTER, name: 'Productivity level' },
+    { index: 2, map: RescuetimeService.EMAIL_FILTER, name: 'Email duration' },
+    { index: 3, map: RescuetimeService.ONLINE_CHAT_FILTER, name: 'Online chat duration' },
+    { index: 4, map: RescuetimeService.SNS_FILTER, name: 'SNS duration' }
   ];
 
   private selected = { 
@@ -109,7 +113,7 @@ export class DashboardPageComponent implements OnInit {
   private reloadRTGraph(): void {
     if (this.lastSelected.rtKey.length > 0) {
       this.graphEventService.load(true);
-      this.rescuetimeService.retrieveActivityNumber(this.lastSelected.rtKey, this.rtDate().start, this.rtDate().end)
+      this.rescuetimeService.retrieveRescueTimeValues(this.lastSelected.rtKey, this.rtOptions[this.selected.rtOption].map, this.rtDate().start, this.rtDate().end)
         .then(rtData => {
           this.prepareGraphSeries(rtData, this.rtOptions, 'rtOption', 'line', 1, '#ac5f20', true);
           this.graphEventService.load(false);
@@ -147,12 +151,13 @@ export class DashboardPageComponent implements OnInit {
         let end = this.getGraphDate().end;
         let sensorFilter = this.sensors[this.selected.sensor].map;
         let emotionFilter = this.emotions[this.selected.emotion].map;
+        let rtFilter = this.rtOptions[this.selected.rtOption].map;
 
         this.databankService.retrieveSensorValues(graphUser.userId, sensorFilter, start, end)
           .then(sensorData => {
             this.databankService.retrieveEmotionValues(graphUser.userId, emotionFilter, start, end)
               .then(emotionData => {
-                this.rescuetimeService.retrieveActivityNumber(graphUser.rtKey, this.rtDate().start, this.rtDate().end)
+                this.rescuetimeService.retrieveRescueTimeValues(graphUser.rtKey, rtFilter, this.rtDate().start, this.rtDate().end)
                   .then(rtData => {
                     this.prepareGraphSeries(sensorData, this.sensors, 'sensor', 'line', 0, '#814718', false);
                     this.prepareGraphSeries(rtData, this.rtOptions, 'rtOption', 'line', 1, '#ac5f20', true);

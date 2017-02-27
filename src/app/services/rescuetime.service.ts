@@ -8,6 +8,12 @@ import { Datapoint } from '../classes/datapoint';
 
 @Injectable()
 export class RescuetimeService {
+  public static TASKS_FILTER = 'activity_number';
+  public static PRODUCTIVITY_FILTER = 'productivity_level';
+  public static EMAIL_FILTER = 'Email';
+  public static ONLINE_CHAT_FILTER = 'Instant Message';
+  public static SNS_FILTER = 'General Social Networking';
+
   private static DATA_API_URL = 'https://www.rescuetime.com/anapi/data';
 
   constructor(private http: Http) { }
@@ -33,7 +39,7 @@ export class RescuetimeService {
       .catch(RescuetimeService.handleError);
   }
 
-  retrieveActivityNumber(key: string, start: string, end: string): Promise<Datapoint[]> {
+  private retrieveActivityNumber(key: string, start: string, end: string): Promise<Datapoint[]> {
 		return new Promise((resolve, reject) => {
 			this.fetchRawActivities(key, start, end)
 				.then(arrays => {
@@ -54,4 +60,55 @@ export class RescuetimeService {
 			});
   }
 
+  private retrieveProductivity(key: string, start: string, end: string): Promise<Datapoint[]> {
+		return new Promise((resolve, reject) => {
+			this.fetchRawActivities(key, start, end)
+				.then(arrays => {
+					let bufferData = {};
+					_.each(arrays, function (e) {
+						let date = new Date(e[0]);
+						let timestamp = date.getTime() + date.getTimezoneOffset()*60*1000;
+            if (!bufferData[timestamp]) bufferData[timestamp] = 0;
+            bufferData[timestamp] += Math.round(e[1] * e[5] / 6.0);
+					});
+
+					let dataArray = [];
+					_.forOwn(bufferData, function(val, key) { dataArray.push({ timestamp: Number(key), value: val }) });
+
+					resolve(dataArray);
+				})
+				.catch(error => reject(error))
+			});
+  }
+
+  private retrieveSpecificDuration(key: string, filterString: string, start: string, end: string): Promise<Datapoint[]> {
+		return new Promise((resolve, reject) => {
+			this.fetchRawActivities(key, start, end)
+				.then(arrays => {
+					let bufferData = {};
+					_.each(arrays, function (e) {
+						let date = new Date(e[0]);
+						let timestamp = date.getTime() + date.getTimezoneOffset()*60*1000;
+            if (!bufferData[timestamp]) bufferData[timestamp] = 0;
+            if (e[4] == filterString) bufferData[timestamp] += e[1];
+					});
+
+					let dataArray = [];
+					_.forOwn(bufferData, function(val, key) { dataArray.push({ timestamp: Number(key), value: val }) });
+
+					resolve(dataArray);
+				})
+				.catch(error => reject(error))
+			});
+  }
+
+  retrieveRescueTimeValues(key: string, filterString: string, start: string, end: string): Promise<Datapoint[]> {
+    if (filterString == RescuetimeService.TASKS_FILTER) {
+      return this.retrieveActivityNumber(key, start, end);
+    } else if (filterString == RescuetimeService.PRODUCTIVITY_FILTER) {
+      return this.retrieveProductivity(key, start, end);
+    } else {
+      return this.retrieveSpecificDuration(key, filterString, start, end);
+    }
+  }
 }
