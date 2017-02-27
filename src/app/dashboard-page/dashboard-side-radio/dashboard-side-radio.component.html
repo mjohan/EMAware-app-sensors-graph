@@ -1,6 +1,6 @@
 <div class="w3-white w3-text-grey w3-card-4" style="margin-bottom: 8px">
   <div class="w3-container w3-small">
-    <h5 class="w3-text-grey"><i class="fa fa-database w3-margin-right w3-large w3-text-teal"></i>{{title}}</h5>
+    <h5 class="w3-text-grey" style="margin-top: 8px"><i class="fa fa-database w3-margin-right w3-large w3-text-teal"></i>{{title}}</h5>
     <div *ngFor="let option of options">
       <p>
         <input class="w3-radio w3-small" type="radio" name="{{key}}" [(ngModel)]="selected[key]" [value]="option.index" (ngModelChange)="optionRadioChanged()">
