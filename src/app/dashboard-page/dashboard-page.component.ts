@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 
 import { GraphOption } from "../classes/graph-option";
 import { Datapoint } from "../classes/datapoint";
+import { FilterOption } from '../classes/filter-option'
 import { GraphEventService } from "../services/graph-event.service";
 import { DatabankService } from "../services/databank.service";
 import { RescuetimeService } from "../services/rescuetime.service";
@@ -19,25 +20,38 @@ export class DashboardPageComponent implements OnInit {
   private error = { message: '' };
 
   private emotions = [
-    { index: 0, map: 'excitement', name: 'Engagement', selectItems: [] },
-    { index: 1, map: 'boredom', name: 'Boredom', selectItems: [] },
-    { index: 2, map: 'angriness', name: 'Frustration', selectItems: [] },
-    { index: 3, map: 'stress', name: 'Confusion', selectItems: [] }
+    { index: 0, map: { type: 'emotion', value: 'excitement' }, name: 'Engagement', selectItems: [] },
+    { index: 1, map: { type: 'emotion', value: 'boredom' }, name: 'Boredom', selectItems: [] },
+    { index: 2, map: { type: 'emotion', value: 'angriness' }, name: 'Frustration', selectItems: [] },
+    { index: 3, map: { type: 'emotion', value: 'stress' }, name: 'Confusion', selectItems: [] }
   ];
 
   private sensors = [
-    { index: 0, map: 'rrInterval', name: 'RR interval', selectItems: [] },
-    { index: 1, map: 'gsr', name: 'Skin conductance', selectItems: [] },
-    { index: 2, map: 'accelerometer', name: 'Accelerometer', selectItems: [] }
+    { index: 0, map: { type: 'sensor', value: 'rrInterval' }, name: 'RR interval', selectItems: [] },
+    { index: 1, map: { type: 'sensor', value: 'gsr' }, name: 'Skin conductance', selectItems: [] },
+    { index: 2, map: { type: 'sensor', value: 'accelerometer' }, name: 'Accelerometer', selectItems: [] }
   ];
 
   private rtOptions = [
-    { index: 0, map: RescuetimeService.TASKS_FILTER, name: 'Activities number', selectItems: [] },
-    { index: 1, map: RescuetimeService.PRODUCTIVITY_FILTER, name: 'Productivity level', selectItems: [] },
-    { index: 2, map: RescuetimeService.EMAIL_FILTER, name: 'Specific activity', selectItems: [
-      { name: "Email duration", value: RescuetimeService.EMAIL_FILTER },
-      { name: "Online chat duration", value: RescuetimeService.ONLINE_CHAT_FILTER }, 
-      { name: "SNS duration", value: RescuetimeService.SNS_FILTER}] 
+    { index: 0, map: RescuetimeService.FILTER.TASK, name: 'Activities number', selectItems: [] },
+    { index: 1, map: RescuetimeService.FILTER.PRODUCTIVITY, name: 'Productivity level', selectItems: [] },
+    { index: 2, map: RescuetimeService.FILTER.EMAIL, name: 'Specific activity', selectItems: [
+      { name: "Email duration", value: RescuetimeService.FILTER.EMAIL },
+      { name: "Online chat duration", value: RescuetimeService.FILTER.CHAT }] 
+    },
+    { index: 3, map: RescuetimeService.FILTER.SOCMED, name: 'Specific category', selectItems: [
+      { name: "Social networking", value: RescuetimeService.FILTER.SOCMED },
+      { name: "Communication & scheduling", value: RescuetimeService.FILTER.COMMSCHED },
+      { name: "News & Opinion", value: RescuetimeService.FILTER.NEWS },
+      { name: "Business", value: RescuetimeService.FILTER.BUSINESS },
+      { name: "Entertainment", value: RescuetimeService.FILTER.ENTERTAINMENT },
+      { name: "Design & Composition", value: RescuetimeService.FILTER.DESIGN },
+      { name: "Reference & Learning", value: RescuetimeService.FILTER.REFERENCE },
+      { name: "Software Development", value: RescuetimeService.FILTER.DEVELOPMENT },
+      { name: "Shopping", value: RescuetimeService.FILTER.SHOPPING },
+      { name: "Utilities", value: RescuetimeService.FILTER.UTILITIES },
+      { name: "Miscellaneous", value: RescuetimeService.FILTER.MISC },
+      { name: "Uncategorized", value: RescuetimeService.FILTER.ETC }]
     }
   ];
 
@@ -101,7 +115,7 @@ export class DashboardPageComponent implements OnInit {
   private reloadEmotionGraph(): void {
     if (this.lastSelected.userId.length > 0) {
       this.graphEventService.load(true);
-      this.databankService.retrieveEmotionValues(this.lastSelected.userId, this.emotions[this.selected.emotion].map, this.getGraphDate().start, this.getGraphDate().end)
+      this.databankService.retrieveEmotionValues(this.lastSelected.userId, this.emotions[this.selected.emotion].map.value, this.getGraphDate().start, this.getGraphDate().end)
         .then(sensordata => {
           this.prepareGraphSeries(sensordata, this.emotions, 'emotion', 'scatter', 2, '#db843d', false);
           this.graphEventService.load(false);
@@ -112,12 +126,12 @@ export class DashboardPageComponent implements OnInit {
     }
   }
 
-  private reloadRTGraph(option: string): void {
-    let filterString = (option)? option : this.rtOptions[this.selected.rtOption].map;
+  private reloadRTGraph(option: FilterOption): void {
+    let filter = (option)? option : this.rtOptions[this.selected.rtOption].map;
 
     if (this.lastSelected.rtKey.length > 0) {
       this.graphEventService.load(true);
-      this.rescuetimeService.retrieveRescueTimeValues(this.lastSelected.rtKey, filterString, this.rtDate().start, this.rtDate().end)
+      this.rescuetimeService.retrieveRescueTimeValues(this.lastSelected.rtKey, filter, this.rtDate().start, this.rtDate().end)
         .then(rtData => {
           this.prepareGraphSeries(rtData, this.rtOptions, 'rtOption', 'line', 1, '#ac5f20', true);
           this.graphEventService.load(false);
@@ -131,7 +145,7 @@ export class DashboardPageComponent implements OnInit {
   private reloadSensorGraph(): void {
     if (this.lastSelected.userId.length > 0) {
       this.graphEventService.load(true);
-      this.databankService.retrieveSensorValues(this.lastSelected.userId, this.sensors[this.selected.sensor].map, this.getGraphDate().start, this.getGraphDate().end)
+      this.databankService.retrieveSensorValues(this.lastSelected.userId, this.sensors[this.selected.sensor].map.value, this.getGraphDate().start, this.getGraphDate().end)
         .then(sensordata => {
           this.prepareGraphSeries(sensordata, this.sensors, 'sensor', 'line', 0, '#db843d', false);
           this.graphEventService.load(false);
@@ -153,8 +167,8 @@ export class DashboardPageComponent implements OnInit {
 
         let start = this.getGraphDate().start;
         let end = this.getGraphDate().end;
-        let sensorFilter = this.sensors[this.selected.sensor].map;
-        let emotionFilter = this.emotions[this.selected.emotion].map;
+        let sensorFilter = this.sensors[this.selected.sensor].map.value;
+        let emotionFilter = this.emotions[this.selected.emotion].map.value;
         let rtFilter = this.rtOptions[this.selected.rtOption].map;
 
         this.databankService.retrieveSensorValues(graphUser.userId, sensorFilter, start, end)

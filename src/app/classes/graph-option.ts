@@ -1,9 +1,11 @@
+import { FilterOption } from '../classes/filter-option'
+
 export class GraphOption {
 	index: number;
-	map: string;
+	map: FilterOption;
 	name: string;
 	selectItems: Array<{
 		name: string;
-		value: string;
+		value: FilterOption;
 	}>;
 }

@@ -9,7 +9,7 @@
       <p *ngIf="selected[key] == option.index && option.selectItems.length > 0">
         <select class="w3-select" name="option" [ngModel]="selectedItem" (ngModelChange)="onSelectChange($event)">
           <option value="" selected disabled>Please select one option</option>
-          <option *ngFor="let item of option.selectItems" [value]="item.value">{{ item.name }}</option>
+          <option *ngFor="let item of option.selectItems; let i = index" [value]="i">{{ item.name }}</option>
         </select>
       </p>
     </div>
