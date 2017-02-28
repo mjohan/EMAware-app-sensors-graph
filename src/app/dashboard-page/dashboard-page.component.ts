@@ -19,24 +19,26 @@ export class DashboardPageComponent implements OnInit {
   private error = { message: '' };
 
   private emotions = [
-    { index: 0, map: 'excitement', name: 'Engagement' },
-    { index: 1, map: 'boredom', name: 'Boredom' },
-    { index: 2, map: 'angriness', name: 'Frustration' },
-    { index: 3, map: 'stress', name: 'Confusion' }
+    { index: 0, map: 'excitement', name: 'Engagement', selectItems: [] },
+    { index: 1, map: 'boredom', name: 'Boredom', selectItems: [] },
+    { index: 2, map: 'angriness', name: 'Frustration', selectItems: [] },
+    { index: 3, map: 'stress', name: 'Confusion', selectItems: [] }
   ];
 
   private sensors = [
-    { index: 0, map: 'rrInterval', name: 'RR interval' },
-    { index: 1, map: 'gsr', name: 'Skin conductance' },
-    { index: 2, map: 'accelerometer', name: 'Accelerometer' }
+    { index: 0, map: 'rrInterval', name: 'RR interval', selectItems: [] },
+    { index: 1, map: 'gsr', name: 'Skin conductance', selectItems: [] },
+    { index: 2, map: 'accelerometer', name: 'Accelerometer', selectItems: [] }
   ];
 
   private rtOptions = [
-    { index: 0, map: RescuetimeService.TASKS_FILTER, name: 'Activities number' },
-    { index: 1, map: RescuetimeService.PRODUCTIVITY_FILTER, name: 'Productivity level' },
-    { index: 2, map: RescuetimeService.EMAIL_FILTER, name: 'Email duration' },
-    { index: 3, map: RescuetimeService.ONLINE_CHAT_FILTER, name: 'Online chat duration' },
-    { index: 4, map: RescuetimeService.SNS_FILTER, name: 'SNS duration' }
+    { index: 0, map: RescuetimeService.TASKS_FILTER, name: 'Activities number', selectItems: [] },
+    { index: 1, map: RescuetimeService.PRODUCTIVITY_FILTER, name: 'Productivity level', selectItems: [] },
+    { index: 2, map: RescuetimeService.EMAIL_FILTER, name: 'Specific activity', selectItems: [
+      { name: "Email duration", value: RescuetimeService.EMAIL_FILTER },
+      { name: "Online chat duration", value: RescuetimeService.ONLINE_CHAT_FILTER }, 
+      { name: "SNS duration", value: RescuetimeService.SNS_FILTER}] 
+    }
   ];
 
   private selected = { 
@@ -106,21 +108,23 @@ export class DashboardPageComponent implements OnInit {
         }
       );
     } else {
-      console.log("userId is empty");
+      this.error.message = "Please search username first"
     }
   }
 
-  private reloadRTGraph(): void {
+  private reloadRTGraph(option: string): void {
+    let filterString = (option)? option : this.rtOptions[this.selected.rtOption].map;
+
     if (this.lastSelected.rtKey.length > 0) {
       this.graphEventService.load(true);
-      this.rescuetimeService.retrieveRescueTimeValues(this.lastSelected.rtKey, this.rtOptions[this.selected.rtOption].map, this.rtDate().start, this.rtDate().end)
+      this.rescuetimeService.retrieveRescueTimeValues(this.lastSelected.rtKey, filterString, this.rtDate().start, this.rtDate().end)
         .then(rtData => {
           this.prepareGraphSeries(rtData, this.rtOptions, 'rtOption', 'line', 1, '#ac5f20', true);
           this.graphEventService.load(false);
         }
       );
     } else {
-      console.log("rtKey is empty");
+      this.error.message = "Please search username first"
     }
   }
 
@@ -134,7 +138,7 @@ export class DashboardPageComponent implements OnInit {
         }
       );
     } else {
-      console.log("userId is empty");
+      this.error.message = "Please search username first"
     }
   }
 

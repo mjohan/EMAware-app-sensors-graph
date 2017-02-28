@@ -30,7 +30,8 @@
         [(selected)]="selected"
         key="rtOption"
         title="RescueTime"
-        (selectedItemChanged)="reloadRTGraph()">
+        (selectedItemChanged)="reloadRTGraph()" 
+        (selectedItemOptionChanged)="reloadRTGraph($event)">
       </dashboard-side-radio>
 
       <dashboard-side-radio

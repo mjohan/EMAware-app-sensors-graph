@@ -37,7 +37,6 @@ export class DatabankService {
 
     let dataPoints = _.map(userFiltered, function (e: any) {
       let val = (zeroize) ? e[filterKey] - 1 : e[filterKey];
-      if (zeroize) console.log(val);
       return {
         timestamp: new Date(e.timestamp).getTime(),
         value: val

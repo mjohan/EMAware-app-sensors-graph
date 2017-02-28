@@ -6,6 +6,12 @@
         <input class="w3-radio w3-small" type="radio" name="{{key}}" [(ngModel)]="selected[key]" [value]="option.index" (ngModelChange)="optionRadioChanged()">
         <label class="w3-validate w3-medium">{{ option.name }}</label>
       </p>
+      <p *ngIf="selected[key] == option.index && option.selectItems.length > 0">
+        <select class="w3-select" name="option" [ngModel]="selectedItem" (ngModelChange)="onSelectChange($event)">
+          <option value="" selected disabled>Please select one option</option>
+          <option *ngFor="let item of option.selectItems" [value]="item.value">{{ item.name }}</option>
+        </select>
+      </p>
     </div>
     <br>
   </div>
