@@ -5,14 +5,30 @@ import 'rxjs/add/operator/toPromise';
 import * as _ from 'lodash';
 
 import { Datapoint } from '../classes/datapoint';
+import { FilterOption } from '../classes/filter-option'
 
 @Injectable()
 export class RescuetimeService {
-  public static TASKS_FILTER = 'activity_number';
-  public static PRODUCTIVITY_FILTER = 'productivity_level';
-  public static EMAIL_FILTER = 'Email';
-  public static ONLINE_CHAT_FILTER = 'Instant Message';
-  public static SNS_FILTER = 'General Social Networking';
+  private static TYPE = { GENERAL: 'general', ACTIVITY: 'activity', CATEGORY: 'overview' };
+
+  public static FILTER = {
+    TASK: { type: RescuetimeService.TYPE.GENERAL, value: 'activity_number' },
+    PRODUCTIVITY: { type: RescuetimeService.TYPE.GENERAL, value: 'productivity_level' },
+    EMAIL: { type: RescuetimeService.TYPE.ACTIVITY, value: 'Email' },
+    CHAT: { type: RescuetimeService.TYPE.ACTIVITY, value: 'Instant Message' },
+    SOCMED: { type: RescuetimeService.TYPE.CATEGORY, value: 'Social Networking' },
+    BUSINESS: { type: RescuetimeService.TYPE.CATEGORY, value: 'Business' },
+    COMMSCHED: { type: RescuetimeService.TYPE.CATEGORY, value: 'Communication & Scheduling' },
+    DESIGN: { type: RescuetimeService.TYPE.CATEGORY, value: 'Design & Composition' },
+    ENTERTAINMENT: { type: RescuetimeService.TYPE.CATEGORY, value: 'Entertainment' },
+    NEWS: { type: RescuetimeService.TYPE.CATEGORY, value: 'News & Opinion' },
+    REFERENCE: { type: RescuetimeService.TYPE.CATEGORY, value: 'Reference & Learning' },
+    DEVELOPMENT: { type: RescuetimeService.TYPE.CATEGORY, value: 'Software Development' },
+    SHOPPING: { type: RescuetimeService.TYPE.CATEGORY, value: 'Shopping' },
+    UTILITIES: { type: RescuetimeService.TYPE.CATEGORY, value: 'Utilities' },
+    MISC: { type: RescuetimeService.TYPE.CATEGORY, value: 'Miscellaneous' },
+    ETC: { type: RescuetimeService.TYPE.CATEGORY, value: 'Uncategorized' }
+  };
 
   private static DATA_API_URL = 'https://www.rescuetime.com/anapi/data';
 
@@ -23,11 +39,11 @@ export class RescuetimeService {
     return Promise.reject(error.message || error);
   }
 
-  private fetchRawActivities(key: string, start: string, end: string): Promise<Array<number | string>> {
+  private fetchRawActivities(key: string, type: string, start: string, end: string): Promise<Array<number | string>> {
     let requestUrl = RescuetimeService.DATA_API_URL + '?' + 
                       'key=' + key + '&' + 
                       'perspective=interval&' + 
-                      'restrict_kind=activity&' +
+                      'restrict_kind=' + type + '&' +
                       'resolution_time=minute&' +
                       'format=json&' +
                       'restrict_begin=' + start + '&' +
@@ -41,7 +57,7 @@ export class RescuetimeService {
 
   private retrieveActivityNumber(key: string, start: string, end: string): Promise<Datapoint[]> {
 		return new Promise((resolve, reject) => {
-			this.fetchRawActivities(key, start, end)
+			this.fetchRawActivities(key, RescuetimeService.TYPE.ACTIVITY, start, end)
 				.then(arrays => {
 					let bufferData = {};
 					_.each(arrays, function (e) {
@@ -62,7 +78,7 @@ export class RescuetimeService {
 
   private retrieveProductivity(key: string, start: string, end: string): Promise<Datapoint[]> {
 		return new Promise((resolve, reject) => {
-			this.fetchRawActivities(key, start, end)
+			this.fetchRawActivities(key, RescuetimeService.TYPE.ACTIVITY, start, end)
 				.then(arrays => {
 					let bufferData = {};
 					_.each(arrays, function (e) {
@@ -81,16 +97,18 @@ export class RescuetimeService {
 			});
   }
 
-  private retrieveSpecificDuration(key: string, filterString: string, start: string, end: string): Promise<Datapoint[]> {
+  private retrieveSpecificDuration(key: string, filter: FilterOption, start: string, end: string): Promise<Datapoint[]> {
 		return new Promise((resolve, reject) => {
-			this.fetchRawActivities(key, start, end)
+			this.fetchRawActivities(key, filter.type, start, end)
 				.then(arrays => {
 					let bufferData = {};
 					_.each(arrays, function (e) {
 						let date = new Date(e[0]);
 						let timestamp = date.getTime() + date.getTimezoneOffset()*60*1000;
             if (!bufferData[timestamp]) bufferData[timestamp] = 0;
-            if (e[4] == filterString) bufferData[timestamp] += e[1];
+
+            let index = (filter.type == RescuetimeService.TYPE.CATEGORY) ? 3 : 4;
+            if (e[index] == filter.value) bufferData[timestamp] += e[1];
 					});
 
 					let dataArray = [];
@@ -102,13 +120,15 @@ export class RescuetimeService {
 			});
   }
 
-  retrieveRescueTimeValues(key: string, filterString: string, start: string, end: string): Promise<Datapoint[]> {
-    if (filterString == RescuetimeService.TASKS_FILTER) {
-      return this.retrieveActivityNumber(key, start, end);
-    } else if (filterString == RescuetimeService.PRODUCTIVITY_FILTER) {
-      return this.retrieveProductivity(key, start, end);
+  retrieveRescueTimeValues(key: string, filter: FilterOption, start: string, end: string): Promise<Datapoint[]> {
+    if (filter.type == RescuetimeService.TYPE.GENERAL) {
+      if (filter.value == RescuetimeService.FILTER.TASK.value) {
+        return this.retrieveActivityNumber(key, start, end);
+      } else {
+        return this.retrieveProductivity(key, start, end);
+      }
     } else {
-      return this.retrieveSpecificDuration(key, filterString, start, end);
+      return this.retrieveSpecificDuration(key, filter, start, end);
     }
   }
 }
