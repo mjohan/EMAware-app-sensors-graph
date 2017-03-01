@@ -32,7 +32,8 @@ export class DatabankService {
 
   private static filterData(userId: string, filterKey: string, dataArray: any, zeroize: boolean): Datapoint[] {
     let userFiltered = _.filter(dataArray, function (e: any) {
-      return e.userId == userId && e.hasOwnProperty(filterKey);
+      let sensauraCheck = (zeroize) ? !e.hasOwnProperty('neutral') : true;
+      return e.userId == userId && e.hasOwnProperty(filterKey) && sensauraCheck;
     });
 
     let dataPoints = _.map(userFiltered, function (e: any) {

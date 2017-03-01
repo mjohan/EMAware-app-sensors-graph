@@ -27,7 +27,6 @@ export class DashboardSideRadioComponent implements OnInit {
 
   onSelectChange(index) {
     let selectedFilter = this.options[this.selected[this.key]].selectItems[index].value;
-    console.log(selectedFilter);
     this.selectedItemOptionChanged.emit(selectedFilter);
   }
 
