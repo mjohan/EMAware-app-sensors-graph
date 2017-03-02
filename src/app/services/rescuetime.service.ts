@@ -57,7 +57,7 @@ export class RescuetimeService {
 
   private retrieveActivityNumber(key: string, start: string, end: string): Promise<Datapoint[]> {
 		return new Promise((resolve, reject) => {
-			this.fetchRawActivities(key, RescuetimeService.TYPE.ACTIVITY, start, end)
+			this.fetchRawActivities(key, RescuetimeService.TYPE.CATEGORY, start, end)
 				.then(arrays => {
 					let bufferData = {};
 					_.each(arrays, function (e) {

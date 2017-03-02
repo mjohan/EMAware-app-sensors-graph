@@ -6,6 +6,7 @@ import { FilterOption } from '../classes/filter-option'
 import { GraphEventService } from "../services/graph-event.service";
 import { DatabankService } from "../services/databank.service";
 import { RescuetimeService } from "../services/rescuetime.service";
+import { RescuetimeFeaturesService } from "../services/rescuetime-features.service";
 
 import * as _ from 'lodash';
 
@@ -66,11 +67,13 @@ export class DashboardPageComponent implements OnInit {
     }
   };
   private lastSelected = { emotion: null, sensor: null, rtOption: null, userId: '', rtKey: '' };
+  private logsBuffer: Datapoint[];
 
   constructor(
     private graphEventService: GraphEventService,
     private databankService: DatabankService,
-    private rescuetimeService: RescuetimeService) { }
+    private rescuetimeService: RescuetimeService,
+    private rescuetimeFeaturesService: RescuetimeFeaturesService) { }
 
   private getGraphDate() {
     let beginDate = this.selected.dateRange.beginDate;
@@ -135,6 +138,8 @@ export class DashboardPageComponent implements OnInit {
         .then(rtData => {
           this.prepareGraphSeries(rtData, this.rtOptions, 'rtOption', 'line', 1, '#ac5f20', true);
           this.graphEventService.load(false);
+
+          this.rescuetimeFeaturesService.mapDatapoints(this.logsBuffer, rtData).then(results => console.log(results));
         }
       );
     } else {
@@ -181,8 +186,11 @@ export class DashboardPageComponent implements OnInit {
                     this.prepareGraphSeries(rtData, this.rtOptions, 'rtOption', 'line', 1, '#ac5f20', true);
                     this.prepareGraphSeries(emotionData, this.emotions, 'emotion', 'scatter', 2, '#db843d', false);
                     this.graphEventService.load(false);
+                    this.logsBuffer = emotionData;
 
                     this.error.message = (sensorData.length > 0 || emotionData.length > 0 || rtData.length > 0) ? '' : 'No data found in this time period';
+
+                    this.rescuetimeFeaturesService.mapDatapoints(emotionData, rtData).then(results => console.log(results));
                   }).catch(() => this.error.message = 'Problem occurred when fetching data from RescueTime');
               });
           });
